@@ -17,12 +17,16 @@ public class OneLaneBridge extends Bridge{
                 cantEnter.wait();//If it cant go right now, put it in the queue
             }
             //set the time of entry for the car that just entered
+            car.setEntryTime(currentTime);
 
             //add the car to the bridge list
+            bridge.add(car);
 
             //print out a car summary
+            printSum();  
 
             //adjust time? maybe idk
+            currentTime++;
         }
     }
 
@@ -36,15 +40,35 @@ public class OneLaneBridge extends Bridge{
             //add sync block to prevent multiple edits of shared vars
             synchronized(cantEnter){
                 //remove the car from the array list
+                bridge.remove(bridge.indexOf(c));
 
                 //print a summary
+                printSum();
 
                 //Notify those leaving 
+                leaving.notifyAll();
 
-                //if there is nobody on the bridge, notify leaving
+                //if there is nobody on the bridge, switch direction
+                if (bridge.size() < 1 ){
+                    direction = !(direction);
+                }
 
                 //notify cantEnter
+                cantEnter.notifyAll();
             }
         }
+    }
+    public void printSum(){
+        String cars = new StringBuilder("Bridge (dir=");
+        cars.append(direction);
+        cars.append(") :");
+        for (i = 0; i < bridge.size() - 1; i++){
+            cars.append(bridge.get(i).toString());
+            cars.append(", ");
+            
+        }
+        cars.append(bridge.get(bridge.size() - 1).toString());
+        cars.append("]");
+        System.out.println(cars);
     }
 }
